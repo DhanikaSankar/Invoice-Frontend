@@ -1,0 +1,63 @@
+.navlink a{
+  padding-left: 30px;
+  text-decoration: none;
+  color: orange;
+}
+
+.btn-primary {
+  background-color: orange !important;
+  color: black !important;
+  border-color: orange !important;
+  margin: 10px !important;
+}
+.formhead{
+  margin-top: 50px !important;
+}
+.addmore{
+  margin-left: 110px !important;
+  width: 10%;
+  color: white !important;
+  background-color: rgb(7, 130, 7) !important;
+  border: rgb(7, 130, 7) !important;
+}
+h6{
+  padding-left: 110px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+p{
+  padding-left: 10px;
+  /* font-size: large; */
+  font-weight: 500;
+}
+.remove{
+  background-color: rgb(174, 12, 12) !important;
+  color: white !important;
+}
+.header{
+  padding:50px;
+}
+.logout{
+  display: flex;
+  justify-content: end;
+}
+.card{
+  padding-top: 50px;
+  margin-top: 50px;
+}
+.dashboard{
+  padding: 50px;
+}
+.viewcard{
+  padding: 50px;
+}
+.savebtn{
+  width: 300px;
+  color:white;
+}
+.btnsave{
+  display: flex;
+  padding-left: 500px;
+  padding-bottom: 50px;
+}
