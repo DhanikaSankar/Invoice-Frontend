@@ -1,48 +1,76 @@
 import axios from "axios";
+import { MDBIcon } from "mdb-react-ui-kit";
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  Card,
-  Container,
-  FormGroup,
-  Row,
-  Table,
-} from "react-bootstrap";
+import {Button,Card,Container,Form,FormGroup,Row,Table,} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function Invoice() {
   const [products, setProducts] = useState([]);
-  const [option, setOption] = useState();
-  const [price, setPrice] = useState([]);
-  const [total, setTotal] = useState([]);
+  const [productsId, setProductId] = useState('');
+  const [option, setOption] = useState([]);
+  const [price, setPrice] = useState();
+  const [total, setTotal] = useState();
   const [netTotal, setNetTotal] = useState(0);
-  const [inputList, setInputList] = useState([
-    {
-      product_price: "",
-      product_quantity: "",
-      product_total_price: "",
-    },
-  ]);
+  const [inputList, setInputList] = useState([{
+                                              product_id:"",
+                                              product_price: "",
+                                              product_quantity: "",
+                                              product_total_price: "",
+                                            }]);
+
   const [customer, setCustomer] = useState({ customer_name: "", address: "" });
+  const nav = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/index")
-      .then((result) => setProducts(result.data.product));
+    const getProductData= async()=>{
+      const reqData = await fetch('http://localhost:8000/api/index')
+      const resData = await reqData.json()
+      setProducts(await resData.product)
+    }
+    getProductData();
   }, []);
+
+  // Get product 
+    useEffect(() => {
+      const getProductData = async()=>{
+        const reqProData = await fetch(`http://localhost:8000/api/product/${productsId}`);
+        const resProData = await reqProData.json();
+        setOption(await resProData.products);
+      }
+      getProductData();
+  
+    }, [productsId])
+
+
 
   function handleChange(e, index) {
     const { name, value } = e.target;
     const list = [...inputList];
+    console.log(list);
     list[index][name] = value;
     setInputList(list);
-    setTotal(e.target.value * price);
   }
 
+  function handleSetOption(e) {
+    // product id
+    const proId= e.target.value;
+    setProductId(proId);
+
+    // product price
+    const proPrice = option.price
+    setPrice(proPrice)
+
+    // product line total
+    const line = proPrice*inputList.product_quantity
+    setTotal(line)
+
+  }
+
+
   function handleAdd() {
-    setPrice();
     setInputList([
       ...inputList,
-      { product_price: "", product_quantity: "", product_total_price: "" },
+      { name:"",product_quantity: "",product_total_price:"",product_price:""},
     ]);
   }
 
@@ -52,23 +80,25 @@ function Invoice() {
     setInputList(list);
   }
 
-  function handleSetOption(e) {
-    setOption(e.target.value); //get product id
-    const proItem = products.map((item, index) => {
-      return index == option ? item.price : "";
-    });
-    let val = proItem.filter((data) => data);
-    setPrice(val);
-  }
-
   function handleCustomer(e) {
     setCustomer({...customer,[e.target.name]:e.target.value});
   }
 
 
-  // console.log(customer);
+  async function handleSave() {
+    const item = {inputList, customer};
+    let result = await fetch("http://localhost:8000/api/add", {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    result = await result.json();
 
-  function handleSave() {}
+    nav('/dashboard')
+  }
 
   return (
     <Container>
@@ -76,6 +106,8 @@ function Invoice() {
         <Card.Title className="text-center" style={{ paddingBottom: "20px" }}>
           INVOICE
         </Card.Title>
+
+
         <Row>
           <FormGroup className="col-md-4" style={{ marginLeft: "110px" }}>
             <label htmlFor="">Customer Name</label>
@@ -84,7 +116,6 @@ function Invoice() {
               className="form-control"
               onChange={(e) => handleCustomer(e)}
               name="customer_name"
-              // value={input.product_total_price}
             />
           </FormGroup>
 
@@ -95,10 +126,11 @@ function Invoice() {
               className="form-control"
               onChange={(e) => handleCustomer(e)}
               name="address"
-              // value={input.product_total_price}
             />
           </FormGroup>
         </Row>
+
+
         {inputList.map((input, i) => {
           return (
             <Row className="formhead">
@@ -107,9 +139,11 @@ function Invoice() {
                 <select
                   className="form-control"
                   onChange={(e) => handleSetOption(e)}
+                  // onChange={(e) => handleChange(e)}
                 >
-                  {products.map((product) => {
-                    return <option value={product.id}>{product.name}</option>;
+                  <option>----Select Product----</option>
+                  {products.map((product,index) => {
+                    return <option key={index} value={product.id}>{product.name}</option>;
                   })}
                 </select>
               </FormGroup>
@@ -121,7 +155,7 @@ function Invoice() {
                   className="form-control"
                   onChange={(e) => handleChange(e, i)}
                   name="product_price"
-                  value={price}
+                  value={option.price}
                   readOnly
                 />
               </FormGroup>
@@ -129,7 +163,7 @@ function Invoice() {
               <FormGroup className="col-md-2">
                 <label htmlFor="">Quantity</label>
                 <input
-                  type="text"
+                  type="number"
                   className="form-control"
                   onChange={(e) => handleChange(e, i)}
                   name="product_quantity"
@@ -144,25 +178,27 @@ function Invoice() {
                   className="form-control"
                   onChange={(e) => handleChange(e, i)}
                   name="product_total_price"
-                  // value={input.product_total_price}
-                  value={total}
-                  readOnly
+                  // value={total}
+                  // readOnly
                 />
               </FormGroup>
 
               <FormGroup className="col-md-2 mt-2">
                 <Button onClick={() => handleRemove(i)} className="remove">
-                  Remove
+                <MDBIcon fas icon="trash" />
                 </Button>
               </FormGroup>
+        
             </Row>
+      
           );
         })}
-        <Button onClick={handleAdd} className="addmore">
-          Add More
+        
+        <Button onClick={handleAdd} className="addmore" >
+          Add Product
         </Button>
 
-        <h6>TOTAL : {netTotal}</h6>
+        {/* <h6>TOTAL : {netTotal}</h6> */}
         <div className="btnsave">
           <Button onClick={handleSave} type="submit" className="savebtn">
             SAVE

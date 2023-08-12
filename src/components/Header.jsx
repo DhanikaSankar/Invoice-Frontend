@@ -13,10 +13,9 @@ function Header() {
 
   function logOut() {
     localStorage.clear();
-    nav("/login");
+    nav("/");
   }
 
-  console.log(storageInfo);
 
   return (
     <>

@@ -8,14 +8,17 @@ import Dashboard from "./components/Dashboard";
 import Invoice from "./components/Invoice";
 import ViewInvoice from "./components/ViewInvoice";
 import EditInvoice from "./components/EditInvoice";
+import axios from "axios";
+import { useEffect } from "react";
 
 function App() {
+
   return (
     <div className="App">
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/view/:id" element={<ViewInvoice />} />

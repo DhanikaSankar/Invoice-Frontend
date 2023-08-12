@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +17,8 @@ function Login() {
 
   async function logIn() {
     const item = { email, password };
-    // console.warn(item)
-    let result = await fetch("http://localhost:8000/api/login", {
+  
+    let result = await fetch("http://localhost:8000/api/", {
       method: "POST",
       body: JSON.stringify(item),
       headers: {
@@ -26,13 +27,13 @@ function Login() {
       },
     });
     result = await result.json();
-    // console.log(result['status']);
     localStorage.setItem("user-info", JSON.stringify(result));
 
+    console.log(result);
+
     if (result["status"] === 401) {
-      // console.log(32323);
-      // localStorage.clear();
-      nav("/login");
+      localStorage.clear();
+      nav("/");
     } else {
       nav("/dashboard");
     }
